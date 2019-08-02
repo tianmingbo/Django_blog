@@ -1,0 +1,107 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <title>注册页面</title>
+    <link rel="stylesheet" href="/static/bootstrap/css/bootstrap.min.css">
+    <link rel="stylesheet" href="/static/css/mystyle.css">
+</head>
+<body>
+<div class="container">
+    <div class="row">
+        <div class="col-md-6 col-md-offset-3">
+            <form novalidate autocomplete="off" action="/reg/" method="post" class="form-horizontal reg-form"
+                  enctype="multipart/form-data">
+                {% csrf_token %}
+
+                <div class="form-group">
+                    <label for="{{ use_form.username.id_for_label }}"
+                           class="col-sm-2 control-label">{{ use_form.username.label }}</label>
+                    <div class="col-sm-8">
+                        {{ use_form.username }}
+                        <span class="help-block">{{ use_form.username.errors.0 }}</span>
+                    </div>
+                </div>
+
+
+                <div class="form-group">
+                    <label for="{{ use_form.password.id_for_label }}"
+                           class="col-sm-2 control-label">{{ use_form.password.label }}</label>
+                    <div class="col-sm-8">{{ use_form.password }}
+                        <span class="help-block">{{ use_form.password.errors.0 }}</span></div>
+
+                </div>
+
+                <div class="form-group">
+                    <label for="{{ use_form.re_password.id_for_label }}"
+                           class="col-sm-2 control-label">{{ use_form.re_password.label }}</label>
+                    <div class="col-sm-8">{{ use_form.re_password }}
+                        <span class="help-block">{{ use_form.re_password.errors.0 }}</span></div>
+
+                </div>
+
+                <div class="form-group">
+                    <label for="{{ use_form.email.id_for_label }}"
+                           class="col-sm-2 control-label">{{ use_form.email.label }}</label>
+                    <div class="col-sm-8">{{ use_form.email }}
+                        <span class="help-block">{{ use_form.email.errors.0 }}</span>
+                    </div>
+
+                </div>
+
+                <div class="form-group">
+                    <div class="col-sm-offset-2 col-sm-10">
+                        <button type="button" class="btn btn-success" id="reg-submit">注册</button>
+                    </div>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<script src="/static/jquery-3.3.1.js"></script>
+<script src="/static/bootstrap/js/bootstrap.min.js"></script>
+
+<script>
+    //ajax提交数据,给注册按钮绑定事件
+    $('#reg-submit').click(function () {
+        //获得用户提交的数据
+        var data = new FormData();
+        data.append("username", $("#id_username").val());
+        data.append("password", $("#id_password").val());
+        data.append("re_password", $("#id_re_password").val());
+        data.append("email", $("#id_email").val());
+        data.append("csrfmiddlewaretoken", $("[name='csrfmiddlewaretoken']").val());
+
+        $.ajax({
+            data: data,
+            type: "post",
+            url: '/reg/',
+            processData: false,  // 告诉jQuery不要处理我的数据
+            contentType: false,  // 告诉jQuery不要设置content类型
+            success: function (data) {
+                if (data.status) {
+                    // 有错误就展示错误
+                    // console.log(data.msg);
+                    // 将报错信息填写到页面上
+                    $.each(data.msg, function (k, v) {
+                        // console.log("id_"+k, v[0]);
+                        // console.log($("#id_"+k));
+                        $("#id_" + k).next("span").text(v[0]).parent().parent().addClass("has-error");
+                    })
+
+                } else {
+                    // 没有错误就跳转到指定页面
+                    location.href = data.msg;
+                }
+            }
+        })
+    });
+    //将所有的input框绑定获取焦点的事件，将所有的错误信息清空 .当鼠标移开，错误信息清空
+    $("form input").focus(function () {
+        $(this).next.text("").parent().parent().removeClass("has-error");
+    });
+
+</script>
+</body>
+</html>
