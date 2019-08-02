@@ -2,6 +2,7 @@ from django.shortcuts import render, redirect, HttpResponse
 from django.contrib import auth
 from blog import models, forms
 from django.http import JsonResponse
+from django.db.models import Count
 
 
 # Create your views here.
@@ -24,6 +25,7 @@ def index(request):
         else:
             return redirect('/login/')
     articles = models.Article.objects.all()
+
     return render(request, 'index.html', locals())
 
 
@@ -48,3 +50,38 @@ def register(request):
 def logout(request):
     auth.logout(request)
     return redirect("/index/")
+
+
+def article_detail(request, username, pk):
+    '''
+    :param request:
+    :param username:  被访问的用户名
+    :param pk:  #被访问的文章id
+    :return:  #返回文章
+    '''
+    article_obj = models.Article.objects.filter(nid=pk).first()
+    content = article_obj.articledetail.content
+    # 获取username所写的文章，进行分类
+    author_obj = models.UserInfo.objects.filter(username=username).first()
+    articles = author_obj.article_set.all()  # 反向查询，获得所有文章
+    arr = []
+    for i in articles:
+        arr.append(i.type)  # 获取文章的类型
+    result = {}
+    for i in set(arr):
+        result[i] = arr.count(i)
+
+    # 按时间分类
+    archive_list = models.Article.objects.filter(user=author_obj).extra(
+        select={"archive_ym": "date_format(create_time,'%%Y-%%m')"}
+    ).values("archive_ym").annotate(c=Count("nid")).values("archive_ym", "c")
+    print(archive_list)
+
+    # 最新文章
+    new_articles = models.Article.objects.all()
+    if len(new_articles) <= 4:
+        return render(request, 'content.html', locals())
+    else:
+        new_articles = new_articles.reverse()
+        new_articles = new_articles[0:4]
+        return render(request, 'content.html', locals())

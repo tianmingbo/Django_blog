@@ -13,7 +13,7 @@ a:hover {
     text-decoration: none;
 }
 
-@media (min-width:768px) {
+@media (min-width: 768px) {
     .container {
         width: auto;
     }
@@ -26,7 +26,7 @@ a:hover {
     padding: 0;
 }
 
-@media (max-width:1240px) {
+@media (max-width: 1240px) {
     .container {
         margin: 0 15px;
     }
@@ -35,11 +35,11 @@ a:hover {
 
 /* 头部开始 */
 
-.navbar>.container .logo {
+.navbar > .container .logo {
     line-height: 60px;
 }
 
-.navbar>.container .logo a {
+.navbar > .container .logo a {
     color: #009a61;
 }
 
@@ -47,7 +47,7 @@ a:hover {
     background-color: #fff;
 }
 
-.navbar-nav>li>a {
+.navbar-nav > li > a {
     line-height: 60px;
     font-size: 16px;
     padding-top: 0;
@@ -71,12 +71,14 @@ a:hover {
     float: left;
 }
 
-@media (max-width:1000px) {
+@media (max-width: 1000px) {
     .content {
         margin-right: 0;
     }
+
     .sidebar {
         display: none;
+        margin-right: 30px;
     }
 }
 
@@ -206,7 +208,7 @@ a:hover {
     color: #009a61;
 }
 
-@media (max-width:680px) {
+@media (max-width: 680px) {
     .excerpt .comment {
         display: none;
     }
@@ -375,10 +377,11 @@ a:hover {
     margin-right: 6px;
 }
 
-@media(max-width:800px) {
+@media (max-width: 800px) {
     .article-meta .tags {
         display: none;
     }
+
     .article-title {
         margin-top: 0;
         font-size: 22px;

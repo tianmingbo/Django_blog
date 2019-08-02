@@ -1,0 +1,8 @@
+{% extends 'base.html' %}
+{% block content_full %}
+    <div class="content">
+    <h2>{{ article_obj.title }}</h2>
+        <hr>
+        <div style="font-size: 20px">{{ content|safe }}</div>
+    </div>
+{% endblock %}

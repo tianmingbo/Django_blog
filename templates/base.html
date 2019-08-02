@@ -75,36 +75,56 @@
 </header>
 
 <div class="container">
-    <div class="introBanner">
-        <h4>走过的路，每一步都算数！</h4>
-    </div>
     <div class="content-wrap">
+        {% block content_full %}
 
-        <div class="content">
-            <div class="title">
-                <h3>最新发布</h3>
+        {% endblock %}
 
+        <div class="sidebar">
+            <div class="widget widget_hot">
+                <h3>最新文章</h3>
+                <ul>
+                    {% for x in new_articles %}
+                        <li>
+                            <a title="" href="#">
+                                <span class="text"><a href="">{{ x.title }}</a></span>
+                                <span class="muted">
+                                            <i class="glyphicon glyphicon-time"></i>
+                                            {{ x.create_time }}
+                                        </span>
+                                <span class="muted">
+                                            <i class="glyphicon glyphicon-eye-open"></i>{{ x.up_count }}</span>
+                            </a>
+                        </li>
+                    {% endfor %}
+
+                </ul>
             </div>
-            {% for article in articles %}
-                <div class="excerpt">
-                    <header>
-                        <h2><a href="/blog/{{ article.user.username }}/article/{{ article.pk }}">{{ article.title }}</a>
-                        </h2>
-                    </header>
-                    <p>
-                        {{ article.desc|safe }}
-                    </p>
-                    <p class="meta">
-                        <a class="time" href="#"><i class="glyphicon glyphicon-time"></i> {{ article.create_time }}</a>
-                        <a class="views" href="#"><i class="glyphicon glyphicon-eye-open"></i> {{ article.up_count }}
-                        </a>
-                        <a class="comment" href="#"><i
-                                class="glyphicon glyphicon-comment"></i> {{ article.comment_count }}</a>
-                    </p>
-                </div>
-            {% endfor %}
+            <div class="widget widget_category">
+                <h3>文章分类</h3>
+                <ul>
+                    {% for i in result.items %}
+                        <li><a href="#"><span class="text"><i
+                                class="glyphicon glyphicon-triangle-right"></i> {{ i.0 }}</span><span
+                                class="count">{{ i.1 }}</span></a>
+                        </li>
+                    {% endfor %}
+
+                </ul>
+            </div>
+            <div class="widget">
+                <h3>归档</h3>
+                <ul>
+                    {% for i in archive_list %}
+                        <li><a><span class="text"><i
+                                class="glyphicon glyphicon-play-circle"></i> {{ i.archive_ym }}</span>({{ i.c }})</a>
+                        </li>
+                    {% endfor %}
+                </ul>
+            </div>
 
         </div>
+
     </div>
 </div>
 
