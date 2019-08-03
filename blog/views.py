@@ -129,3 +129,23 @@ def comment_tree(request, article_id):
     ret = list(models.Comment.objects.filter(article_id=article_id).values('pk', 'content', 'parent_comment_id'))
     # print(ret)
     return JsonResponse(ret, safe=False)
+
+
+def add_blog(request):
+    if request.method == "POST":
+        print(request.POST)
+        title = request.POST.get('title')
+        user = request.user
+        article_content = request.POST.get('article_content')
+        from bs4 import BeautifulSoup
+        bs = BeautifulSoup(article_content, "html.parse")
+        desc = bs.text[0:150] + '...'
+        # 过滤非法标签
+        for tag in bs.find_all():
+            if tag.name in ["script", "link"]:
+                tag.decompose()
+        article_obj = models.Article.objects.create(user=user, tite=title, desc=desc)
+        models.ArticleDetail.objects.create(content=str(bs), article=article_obj)
+
+        return HttpResponse("添加成功")
+    return render(request, 'add_blog.html', locals())
