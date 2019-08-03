@@ -106,8 +106,26 @@ def up_or_down(request):
 
 
 def comment(request):
-    pass
+    print(request.POST)
+    content = request.POST.get("content")
+    article_id = request.POST.get("article_id")
+    pid = request.POST.get("pid")
+    user_pk = request.user.pk
+    response = {}
+    if not pid:
+        # 没有父评论
+        comment_obj = models.Comment.objects.create(article_id=article_id, content=content, user_id=user_pk)
+    else:
+        comment_obj = models.Comment.objects.create(article_id=article_id, content=content, user_id=user_pk,
+                                                    parent_comment_id=pid)
+    response['create_time'] = comment_obj.create_time.strftime("%Y-%m-%d")
+    response['content'] = comment_obj.content
+    response['username'] = comment_obj.user.username
+
+    return JsonResponse(response)
 
 
-def comment_tree(request):
-    pass
+def comment_tree(request, article_id):
+    ret = list(models.Comment.objects.filter(article_id=article_id).values('pk', 'content', 'parent_comment_id'))
+    # print(ret)
+    return JsonResponse(ret, safe=False)

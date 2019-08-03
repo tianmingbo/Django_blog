@@ -78,11 +78,11 @@
 
 
     {#    评论#}
-    <p>评论树</p>
-    <div class="comment_tree">
-
-    </div>
-    <hr>
+{#    <p>评论树</p>#}
+{#    <div class="comment_tree">#}
+{##}
+{#    </div>#}
+{#    <hr>#}
 
     <p>评论列表</p>
 
@@ -122,5 +122,75 @@
         <a href="/login/">登录</a>
     {% endif %}
 
+    <script>
+        //展示评论树
+        {#$.ajax({#}
+        {#    url: "/blog/comment_tree/" + '{{ article_obj.pk }}/',#}
+        {#    success: function (data) {#}
+        {#        console.log(data);#}
+        {##}
+        {#        $.each(data, function (index, comment_dict) {#}
+        {#            var s = '<div class="comment_item" comment_id=' + comment_dict.pk + '> <span class="content">' + comment_dict.content + '</span> </div>'#}
+        {#            if (comment_dict.parent_comment_id) {#}
+        {#                // 子评论#}
+        {#                var pid = comment_dict.parent_comment_id;#}
+        {#                $("[comment_id=" + pid + "]").append(s);#}
+        {#            } else {   //  根评论#}
+        {#                $(".comment_tree").append(s);#}
+        {#            }#}
+        {#        })#}
+        {##}
+        {#    }#}
+        //});
+
+        //提交评论
+        var pid = "";
+        $("#comment_btn").click(function () {
+            var article_id = $(".click_flag").attr("article_id"); //获取登录人id
+            var content = $("#comment_content").val();//获取评论内容
+
+            if (pid) {
+                var index = content.indexOf('\n');
+                content = content.slice(index + 1);
+            }
+
+            $.ajax({
+                url: "/blog/comment/",
+                type: "post",
+                data: {
+                    article_id: article_id,
+                    content: content,
+                    pid: pid,
+                    csrfmiddlewaretoken: $("[name='csrfmiddlewaretoken']").val(),
+                },
+                success: function (data) {
+                    var create_time = data.create_time;
+                    var content = data.content;
+                    var username = data.username;
+
+                    var comment_li = '<li class="list-group-item"><div><span style="color: gray">' + create_time + '</span> &nbsp;&nbsp; <a href=""><span>' + username + '</span></a></div> <div class="con"> <p> ' + content + ' </p> </div> </li>';
+                    $(".comment_list").append(comment_li);
+
+                    //清空文本框
+                    $("#comment_content").val("");
+                    //清空pid
+                    pid = ""
+                }
+
+            });
+
+
+        })
+
+
+        //给回复按钮绑定事件
+        $(".list-group-item .reply_btn").click(function () {
+            $("#comment_content").focus();
+            var v = "@" + $(this).attr("username") + "\n";
+            $("#comment_content").val(v);
+            //pid赋值
+            pid = $(this).attr("comment_pk")
+        })
+    </script>
 
 {% endblock %}
