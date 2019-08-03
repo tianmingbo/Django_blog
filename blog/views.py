@@ -72,7 +72,9 @@ def article_detail(request, username, pk):
     archive_list = models.Article.objects.filter(user=author_obj).extra(
         select={"archive_ym": "date_format(create_time,'%%Y-%%m')"}
     ).values("archive_ym").annotate(c=Count("nid")).values("archive_ym", "c")
-
+    # 评论内容
+    content_list = models.Comment.objects.filter(article_id=pk)
+    print(content_list)
     # 最新文章
     new_articles = models.Article.objects.all()
     if len(new_articles) <= 4:
@@ -101,3 +103,11 @@ def up_or_down(request):
         response["first_action"] = models.ArticleUpDown.objects.filter(user=user, article_id=article_id).first().is_up
         # 获得已经提交的数据，避免重复提交
     return JsonResponse(response)
+
+
+def comment(request):
+    pass
+
+
+def comment_tree(request):
+    pass

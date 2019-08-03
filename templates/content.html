@@ -75,4 +75,52 @@
         });
 
     </script>
+
+
+    {#    评论#}
+    <p>评论树</p>
+    <div class="comment_tree">
+
+    </div>
+    <hr>
+
+    <p>评论列表</p>
+
+    <ul class="comment_list">
+        <li class="list-group-item">
+            {% for i in content_list %}
+                <div>
+                    <a href="#">{{ forloop.counter }}楼</a>
+                    <span style="color:gray;">{{ i.create_time|date:"Y-m-d H:i" }}</span>
+                    <a href=""><span>{{ i.user.username }}</span></a>
+                    <a class="'pull-right reply_btn" username="{{ i.user.username }}"
+                       comment_pk="{{ i.pk }}"><span>回复</span></a>
+                </div>
+                {% if i.parent_comment_id %}
+                    <div class="pid_info well">
+                        <p>{{ i.parent_comment.user.username }}:
+                            {{ i.parent_comment.content }}</p>
+                    </div>
+                {% endif %}
+                <div class="con">
+                    <p>{{ i.content }}</p>
+                </div>
+            {% endfor %}
+        </li>
+    </ul>
+
+    {% if request.user.username %}
+        {#        如果已经登录#}
+        <div class="div_comment">
+            <p>昵称：<input type="text" id="commentAuthor" class="author" disabled="disabled" size="50"
+                         value="{{ request.user.username }}"></p>
+            <p>评论内容</p>
+            <textarea name="" id="comment_content" cols="60" rows="10"></textarea>
+            <button id="comment_btn">提交评论</button>
+        </div>
+    {% else %}
+        <a href="/login/">登录</a>
+    {% endif %}
+
+
 {% endblock %}
