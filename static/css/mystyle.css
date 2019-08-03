@@ -62,9 +62,9 @@
 
 
 #div_digg {
-    float: right;
+    /*float: right;*/
     margin-bottom: 10px;
-    margin-right: 30px;
+    /*margin-right: 30%;*/
     font-size: 12px;
     width: 125px;
     text-align: center;

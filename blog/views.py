@@ -15,10 +15,7 @@ def index(request):
     if request.method == "POST":
         username = request.POST.get('username')
         pwd = request.POST.get('pwd')
-        print(username, pwd)
-        print(models.UserInfo.objects.all())
         user = auth.authenticate(username=username, password=pwd)
-        print(user)
         if user:
             auth.login(request, user)  # 在后端为该用户生成相关session数据
             return redirect('/index/')
@@ -75,7 +72,6 @@ def article_detail(request, username, pk):
     archive_list = models.Article.objects.filter(user=author_obj).extra(
         select={"archive_ym": "date_format(create_time,'%%Y-%%m')"}
     ).values("archive_ym").annotate(c=Count("nid")).values("archive_ym", "c")
-    print(archive_list)
 
     # 最新文章
     new_articles = models.Article.objects.all()
@@ -85,3 +81,23 @@ def article_detail(request, username, pk):
         new_articles = new_articles.reverse()
         new_articles = new_articles[0:4]
         return render(request, 'content.html', locals())
+
+
+from django.db.models import F
+import json
+
+
+# 点赞或者踩
+def up_or_down(request):
+    article_id = request.POST.get('article_id')
+    is_up = json.loads(request.POST.get("is_up"))  # 获取点击，再转换格式
+    user = request.user  # 谁点击的赞或cai
+    response = {"state": True}
+    try:
+        models.ArticleUpDown.objects.create(user=user, article_id=article_id, is_up=is_up)
+        models.Article.objects.filter(pk=article_id).update(up_count=F('up_count') + 1)
+    except Exception as e:
+        response['state'] = False
+        response["first_action"] = models.ArticleUpDown.objects.filter(user=user, article_id=article_id).first().is_up
+        # 获得已经提交的数据，避免重复提交
+    return JsonResponse(response)

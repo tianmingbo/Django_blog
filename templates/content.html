@@ -1,8 +1,78 @@
 {% extends 'base.html' %}
 {% block content_full %}
-    <div class="content">
-    <h2>{{ article_obj.title }}</h2>
+    <div class="content col-md-8">
+        <h2>{{ article_obj.title }}</h2>
         <hr>
         <div style="font-size: 20px">{{ content|safe }}</div>
     </div>
+{% endblock %}
+
+{% block footer_plus %}
+    {#    点赞加评论#}
+    <div class="poll clearfix">
+        <div id="div_digg">
+            <div class="diggit action">
+                <span class="diggnum" id="digg_count">{{ article_obj.up_count }}</span>
+            </div>
+            <div class="buryit action">
+                <span class="burynum" id="bury_count">{{ article_obj.down_count }}</span>
+            </div>
+            <div class="clear"></div>
+            <div class="diggword" id="digg_tips" style="color: red;"></div>
+        </div>
+
+    </div>
+
+    <div class="click_flag" article_id="{{ article_obj.pk }}" username="{{ request.user.username }}"></div>
+    {#    标志是否登录#}
+    {% csrf_token %}
+
+    <script>
+        $("#div_digg .action").click(function () {
+            if ($(".click_flag").attr("username")) {
+                //如果已经登录
+                //点赞或者踩
+                var is_up = $(this).hasClass("diggit");
+                var article_id = $(".click_flag").attr("article_id");
+                $.ajax({
+                    url: "/blog/up_or_down/",
+                    type: "post",
+                    data: {
+                        is_up: is_up,
+                        article_id: article_id,
+                        csrfmiddlewaretoken: $("[name='csrfmiddlewaretoken']").val(),
+                    },
+                    success: function (data) {
+                        console.log(data);
+                        if (data.state) {
+                            if (is_up) {
+                                //赞+1
+                                var val = $("#digg_count").text();
+                                val = parseInt(val) + 1;
+                                $("#digg_count").text(val);
+                            } else {
+                                //踩+1
+                                var val = $("#bury_count").val();
+                                val = parseInt(val) + 1;
+                                $("#bury_count").text(val);
+                            }
+                        } else {
+                            if (data.first_action) {
+                                $("#digg_tips").html("您已经推荐过");
+                            } else {
+                                $("#digg_tips").html("您已经反对过");
+                            }
+
+                            setTimeout(function () {
+                                $("#digg_tips").html("")
+                            }, 1000)
+                        }
+                    }
+                })
+            } else {
+                location.href = '/login/';
+            }
+        });
+
+    </script>
 {% endblock %}
